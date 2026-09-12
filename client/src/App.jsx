@@ -2,23 +2,17 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 
-// Tự động lấy domain Codespaces để gọi đúng API Backend (Port 5000)
-const backendOrigin = window.location.origin.replace('-5174', '-5000').replace('-5173', '-5000');
-const API_URL = `${backendOrigin}/api/students`;
+const API_URL = 'http://localhost:5000/api/students';
 
 function App() {
-  // CÂU 47: Khai báo React State lưu danh sách sinh viên
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // CÂU 48: Khai báo React State quản lý các ô <input> Form (MSSV, Họ tên, Email)
   const [formData, setFormData] = useState({
     mssv: '',
     name: '',
     email: ''
   });
 
-  // CÂU 47: Gọi Axios GET /api/students để lấy danh sách
   const fetchStudents = async () => {
     try {
       const response = await axios.get(API_URL);
@@ -34,13 +28,11 @@ function App() {
     fetchStudents();
   }, []);
 
-  // CÂU 48: Xử lý sự kiện cập nhật State khi nhập liệu vào <input>
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // CÂU 49: Gọi Axios POST /api/students gửi dữ liệu Form lên API
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.mssv || !formData.name || !formData.email) {
@@ -55,11 +47,42 @@ function App() {
         email: formData.email
       });
       alert('Thêm sinh viên thành công!');
-      fetchStudents(); // Cập nhật lại danh sách hiển thị
-      setFormData({ mssv: '', name: '', email: '' }); // Xóa dữ liệu form
+      fetchStudents();
+      setFormData({ mssv: '', name: '', email: '' });
     } catch (error) {
       console.error('Lỗi khi thêm sinh viên:', error);
       alert('Thêm thất bại! Vui lòng kiểm tra lại kết nối Backend.');
+    }
+  };
+
+  const handleEdit = async (student) => {
+    const newName = prompt('Nhập tên mới cho sinh viên:', student.name);
+    if (!newName || newName === student.name) return;
+
+    try {
+      await axios.put(`${API_URL}/${student._id}`, {
+        studentId: student.studentId || student.mssv,
+        name: newName,
+        email: student.email
+      });
+      alert('Cập nhật thành công!');
+      fetchStudents();
+    } catch (error) {
+      console.error('Lỗi khi cập nhật sinh viên:', error);
+      alert('Cập nhật thất bại!');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa sinh viên này?')) {
+      try {
+        await axios.delete(`${API_URL}/${id}`);
+        alert('Xóa sinh viên thành công!');
+        fetchStudents();
+      } catch (error) {
+        console.error('Lỗi khi xóa sinh viên:', error);
+        alert('Xóa thất bại!');
+      }
     }
   };
 
@@ -67,7 +90,6 @@ function App() {
     <div style={{ padding: '20px', textAlign: 'center', fontFamily: 'Arial' }}>
       <h1>Quản lý sinh viên</h1>
 
-      {/* CÂU 48: Form nhập MSSV, Họ tên và Email bằng các thành phần <input> */}
       <h3>Thêm sinh viên mới</h3>
       <form onSubmit={handleSubmit} style={{ marginBottom: '30px' }}>
         <input
@@ -99,7 +121,6 @@ function App() {
         </button>
       </form>
 
-      {/* CÂU 47: Giao diện hiển thị danh sách sinh viên */}
       <h3>Danh sách sinh viên</h3>
       {loading ? (
         <p>Đang tải dữ liệu...</p>
@@ -110,6 +131,7 @@ function App() {
               <th>MSSV</th>
               <th>Họ tên</th>
               <th>Email</th>
+              <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
@@ -118,6 +140,20 @@ function App() {
                 <td>{st.studentId || st.mssv}</td>
                 <td>{st.name}</td>
                 <td>{st.email}</td>
+                <td>
+                  <button
+                    onClick={() => handleEdit(st)}
+                    style={{ padding: '6px 12px', marginRight: '8px', backgroundColor: '#ffc107', color: '#000', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                  >
+                    Sửa
+                  </button>
+                  <button
+                    onClick={() => handleDelete(st._id)}
+                    style={{ padding: '6px 12px', backgroundColor: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                  >
+                    Xóa
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

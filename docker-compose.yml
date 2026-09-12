@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./mern-demo/server
+    container_name: mern-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGODB_URI=mongodb+srv://Khiemh100505:Khiem0385003172@cluster0.xlq2kt0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+    restart: always
+
+  frontend:
+    build: ./client
+    container_name: mern-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: always
+
+networks:
+  default:
+    name: mern-network
