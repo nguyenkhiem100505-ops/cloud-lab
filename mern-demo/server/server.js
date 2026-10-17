@@ -27,6 +27,17 @@ const studentSchema = new mongoose.Schema({
 
 const Student = mongoose.model('Student', studentSchema);
 
+// ==========================================
+// CÂU 44: Health Check API (/health)
+// ==========================================
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'UP',
+        timestamp: new Date(),
+        uptime: process.uptime()
+    });
+});
+
 // Route kiểm tra server
 app.get('/api/hello', (req, res) => {
     res.json({ message: "Backend đang hoạt động thành công!" });
@@ -86,5 +97,5 @@ app.delete('/api/students/:id', async (req, res) => {
 
 // Khởi động Server (Chỉ gọi 1 lần ở cuối file)
 app.listen(PORT, () => {
-    console.log(`Server Backend đang chạy trên port ${PORT}`);
+    console.log(`Server Backend đang chạy trên port ${PORT} Auto Deploy Test v2.0`);
 });

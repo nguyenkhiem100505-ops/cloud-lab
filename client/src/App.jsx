@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 
-const API_URL = 'http://localhost:5000/api/students';
+const API_URL = '/api/students';
 
 function App() {
   const [students, setStudents] = useState([]);
@@ -88,7 +88,7 @@ function App() {
 
   return (
     <div style={{ padding: '20px', textAlign: 'center', fontFamily: 'Arial' }}>
-      <h1>Quản lý sinh viên</h1>
+      <h1>Quản lý sinh viên - Phiên bản 2.0 (v2.0)</h1>
 
       <h3>Thêm sinh viên mới</h3>
       <form onSubmit={handleSubmit} style={{ marginBottom: '30px' }}>
